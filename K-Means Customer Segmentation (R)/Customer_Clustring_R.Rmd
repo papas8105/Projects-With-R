@@ -59,17 +59,18 @@ Visualization of some variables in the dataset.
 
 ## 3.1: Create a barplot for the variable "Gender"
 
-ggplot(data = data) + geom_bar(aes(x = Gender,stat = "count",width = 0.5,
-                                   fill = "steelblue")) + theme_minimal() + 
+ggplot(data = data) + geom_bar(aes(x = Gender),
+                                   fill = "cyan") + theme_minimal() + 
   labs(title = "Barplot to display Gender Comparison",
-       xlab = "Gender")
+       xlab = "Gender") 
 
 ## Mini-challenge 2: Create a histogram for the variable "Age"
 
-ggplot(data = data,aes(x = Age)) + geom_histogram() + 
-  labs(title = "Histogram to show Age distribution")
+ggplot(data = data,aes(x = Age)) + geom_histogram(binwidth = 1) + 
+  labs(title = "Histogram to show Age distribution") + theme_bw()
 
 ## 3.2: Add a density line to the histogram of Age
+
 ggplot(data, aes(x = Age)) +
   geom_vline(aes(xintercept = mean(Age)), color = "blue",
              linetype = "dashed", size = 1.5) +
@@ -81,7 +82,12 @@ ggplot(data, aes(x = Age)) +
 ## 3.3: Create a histogram for the variable "Age" by Gender
 
 ggplot(data = data,aes(x = Age,fill = Gender,color = Gender)) + 
-  geom_histogram(bins = 10,Position = "identity",alpha = 0.5) 
+  geom_histogram(bins = 10,position = "identity",alpha = 0.5) 
+
+## 3.4 Same with dodge position 
+
+ggplot(data = data,aes(x = Age,fill = Gender,color = Gender)) +
+  geom_histogram(bins = 10,position = "dodge")
 ```
 
 ### Part Two
@@ -91,7 +97,7 @@ ggplot(data = data,aes(x = Age,fill = Gender,color = Gender)) +
 
 ## 4.1: Create a density for the variable "annual_income"
 
-ggplot(data = data,aes(x = annual_income)) + geom_density(fill = "blue") + 
+ggplot(data = data,aes(x = annual_income)) + geom_density(fill = "blue",alpha = 0.5,color = "red") + 
   labs(title = "Density Plot For The Annual Income Variable")
 
 ## Mini-challenge 3: Create a boxplot for the variable "spending_score"
@@ -109,7 +115,7 @@ ggplot(data, aes(x = spending_score, y= Gender)) +
 In this task, we will understand the theory and intuition
 behind the K-Means Algorithm
 
-```{r pressure,echo = FALSE,fig.cap = "K-Means Intuition",out.width = '100%'}
+```{r eplanation k-means,echo = FALSE,fig.cap = "K-Means Intuition",out.width = '100%'}
 knitr::include_graphics("k-means-explained.png")
 
 # Source: K-Means Clustering Ayush Kalla on Data Driven Investor
@@ -117,7 +123,7 @@ knitr::include_graphics("k-means-explained.png")
 ```
 
 ```{r algorithm explained}
-## Steps for K-Means Algorithm:
+#### Steps for K-Means Algorithm:
 # 1. Choose the number of clusters "K"
 # 2. Select random K points that are going to be the centroids for each cluster
 # 3. Assign each data point to the nearest centroid, doing so will enable us to 
@@ -129,7 +135,7 @@ knitr::include_graphics("k-means-explained.png")
 # Source: A course by Dr. Ryan Ahmed on Unsupervised Machine Learning
 ```
 
-```{r pressure,echo=FALSE, fig.cap="Steps for K-Means Algorithm",out.width = '100%'}
+```{r kmean steps,echo=FALSE, fig.cap="Steps for K-Means Algorithm",out.width = '100%'}
 knitr::include_graphics("Steps-of-the-K-mean-clustering-algorithm.png")
 
 # Source: Analysis of an Event Forecasting Method for Wireless Sensor Networks by Andras Kalmar et al.
@@ -162,7 +168,7 @@ In this task, we will create a K-Means clustering model for the data.
 
 ```{r k-means clustering}
 
-## 7.1: Create the customer clusters with KMeans
+## 7.1: Create the customer clusters with k-means
 
 ## The optimal K = 6 so we train the data with kmeans built in function
 
@@ -174,7 +180,7 @@ K6
 
 ## 7.2: Show the six K-Means clusters
 
-clusplot(data, k6$cluster, color=TRUE, shade=TRUE, labels=0, lines=0)
+clusplot(data, K6$cluster, color=TRUE, shade=TRUE, labels=0, lines=0)
 ```
 
 ## Task Eight: Principal Component Analysis
@@ -217,7 +223,7 @@ set.seed(1)
 ## 9.2: Create a plot of the customers segments
 
 ggplot(data, aes(x = annual_income , y = spending_score)) + 
-  geom_point(stat = "identity", aes(color = as.factor(k6$cluster))) +
+  geom_point(stat = "identity", aes(color = as.factor(K6$cluster))) +
   scale_color_discrete(name = " ", 
                        breaks=c("1", "2", "3", "4", "5","6"),
                        labels=c("Cluster 1", "Cluster 2", "Cluster 3", 
