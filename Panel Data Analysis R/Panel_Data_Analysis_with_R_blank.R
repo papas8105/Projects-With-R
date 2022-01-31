@@ -9,17 +9,15 @@
 library(plm)
 library(knitr)
 library(broom)
-library(tidyverse)
 library(stargazer)
 library(lmtest)
-library(gplots)
 library(haven)
 
 ## 3. Import Dataset (STATA version)
 #  Rental Data from Wooldridge
 #  Indexed by city and year
 
-RENTAL  <- read_dta("RENTAL.DTA")
+RENTAL   <- read_dta("RENTAL.DTA")
 rental_p <- pdata.frame(RENTAL,index = c("city","year"))
 
 ## 4. Display the data
@@ -30,21 +28,24 @@ str(rental_p) ## indexed RENTAL
 head(RENTAL)
 head(rental_p)
 
-#  Model lrent~y90+lpop+lavginc+pctstu
+#  Model lrent ~ y90 + lpop + lavginc + pctstu
 
 ## 5. OLS using lm
 
-ols <- lm(lrent~y90+lpop+lavginc+pctstu,data = RENTAL)
+ols <- lm(lrent ~ y90 + lpop + lavginc + pctstu,data = RENTAL)
 summary(ols)
 
 ## 6. OLS using plm
 
-pooled  <- plm(lrent~y90+lpop+lavginc+pctstu,data = RENTAL,model = "pooling",
+pooled  <- plm(lrent ~ y90 + lpop + lavginc + pctstu,data = RENTAL,model = "pooling",
               index = c("city","year"))
+
+summary(pooled)
 
 #OR use this format
 
-pooled2 <- plm(lrent~y90+lpop+lavginc+pctstu,data = rental_p,model = "pooling")
+pooled2 <- plm(lrent ~ y90 + lpop + lavginc + pctstu,data = rental_p,model = "pooling")
+summary(pooled2)
 
 ## Results table
 
@@ -56,6 +57,7 @@ res <- residuals(ols)
 yhat <- fitted(ols)
 plot(RENTAL$pctstu,res,xlab = "%Students",ylab = "Residuals")
 plot(yhat,res,xlab = "Fitted Values",ylab = "Residuals")
+
 ## OLS is not the best model: reason heteroscedacity
 
 ## 8. Fixed Effects
@@ -95,7 +97,7 @@ kable(tidy(phtest(fe,re)),caption = "Hausman endogeneity test for the random eff
 ## Ho: No panel effect, i.e., OLS is better. 
 ## Ha: RE is better at p <0.05
 
-plmtest(ols, type=c("bp"))
+plmtest(ols, type=c("bp")) ## will return error 
 plmtest(pooled,type = c("bp"))
 
 ## 13. Test for cross-sectional dependence [NOTE: Suitable only for macro panels with long time
@@ -105,7 +107,8 @@ plmtest(pooled,type = c("bp"))
 pcdtest(fe,test = c("lm"))
 pcdtest(fe,test = c("cd"))
 
-## 14. Testing for serial correlation [NOTE: Suitable only for macro panels with long time series] [Not suitable for RENTAL dataset]
+## 14. Testing for serial correlation [NOTE: Suitable only for macro panels with long time series]
+##     [Not suitable for RENTAL dataset]
 # Ho: There is no serial correlation
 
 pbgtest(fe)
@@ -113,4 +116,3 @@ pbgtest(fe)
 ## 15. Breusch - Pagan test for heteroscedasticity Ho: Homoscedasticity Ha: Heteroscedasticity
 
 bptest(lrent ~ y90 + lpop + lavginc + pctstu,data = rental_p,studentize = F)
-
